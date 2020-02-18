@@ -15,7 +15,7 @@ help:  ## Show possible make targets
 ifeq (, $(shell which gawk))
  $(error "This target requires 'gawk'. Install that first.")
 endif
-	@printf "Usage: $(YELLOW)make$(RESET) $(GREEN)<target>$(RESET)\n"
+	@echo -e "Usage: $(YELLOW)make$(RESET) $(GREEN)<target>$(RESET)"
 	@gawk 'match($$0, /^## (.+)$$/, m) { \
 		printf "\n$(BOLD)%s targets:$(RESET)\n", m[1]; \
 	}; \
@@ -36,19 +36,19 @@ endif
 
 .PHONY: dev
 dev:  ## Initializes repository for development
-	@printf "$(BOLD)-> Setting up pre-commit hooks...$(RESET)\n"
+	@echo -e "$(BOLD)-> Setting up pre-commit hooks...$(RESET)"
 	pre-commit install --install-hooks
 
-	@printf "$(BOLD)-> Removing existing .venv directory if exists...$(RESET)\n"
+	@echo -e "$(BOLD)-> Removing existing .venv directory if exists...$(RESET)"
 	rm -fr .venv
 
-	@printf "$(BOLD)-> Creating virtualenv in .venv...$(RESET)\n"
+	@echo -e "$(BOLD)-> Creating virtualenv in .venv...$(RESET)"
 	python3 -m venv .venv
 
-	@printf "$(BOLD)-> Installing openconnect-sso in develop mode...$(RESET)\n"
+	@echo -e "$(BOLD)-> Installing openconnect-sso in develop mode...$(RESET)"
 	source .venv/bin/activate && poetry install
 
-	@printf "$(BOLD)$(YELLOW)=> Development installation finished.$(RESET)\n"
+	@echo -e "$(BOLD)$(YELLOW)=> Development installation finished.$(RESET)"
 
 .PHONY: clean
 clean:  ## Remove temporary files and artifacts
@@ -95,29 +95,29 @@ dist: CHANGELOG.md  ## Build packages from whatever state the repository is
 .PHONY: tag-repo
 tag-repo: CURRENT_TAG = $(shell git describe --tags)
 tag-repo:
-	@printf "$(BOLD) -> Tagging repository as $(VERSION)...$(RESET)\n"
+	@echo -e "$(BOLD) -> Tagging repository as $(VERSION)...$(RESET)"
 	if [ "$(VERSION)" != "$(CURRENT_TAG)" ]; then \
-		git tag $(VERSION) || { printf "$(BOLD)$(RED) => Existing tag $(VERSION) is not at HEAD!$(RESET)\n" && false; }; \
+		git tag $(VERSION) || { echo -e "$(BOLD)$(RED) => Existing tag $(VERSION) is not at HEAD!$(RESET)" && false; }; \
 	fi
 
 release: before-release before-clean clean dev check tag-repo dist  ## Build release version in a clean environment
-	@printf "$(BOLD)$(GREEN) => Finished building release version $(VERSION).$(RESET)\n"
+	@echo -e "$(BOLD)$(GREEN) => Finished building release version $(VERSION).$(RESET)"
 
 before-clean:
-	@printf "$(YELLOW)"
+	@echo -en "$(YELLOW)"
 	@git clean --dry-run -Xd
-	@printf "$(RESET)$(BOLD) -> CTRL-C in 10s to cancel...$(RESET)\n"
+	@echo -e "$(RESET)$(BOLD) -> CTRL-C in 10s to cancel...$(RESET)"
 	@sleep 10
 
 before-release:
-	@printf "$(BOLD) -> Building release version...$(RESET)\n"
+	@echo -e "$(BOLD) -> Building release version...$(RESET)"
 	@if [ -n "$$(git status --short)" ]; then \
 		git status; \
-		printf "$(BOLD)$(RED) => Repository is dirty!$(RESET)\n"; \
+		echo -e "$(BOLD)$(RED) => Repository is dirty!$(RESET)"; \
 		false; \
 	fi
 	@if [ $$(git rev-parse HEAD) != $$(git rev-parse origin/master) ]; then \
 		git --no-pager log --oneline --graph origin/master...; \
-		printf "$(BOLD)$(RED) => HEAD must point to origin/master!$(RESET)\n"; \
+		echo -e "$(BOLD)$(RED) => HEAD must point to origin/master!$(RESET)"; \
 		false; \
 	fi
