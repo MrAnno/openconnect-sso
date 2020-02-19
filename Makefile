@@ -117,10 +117,10 @@ before-release:
 	if [ -n "$$(git status --short)" ]; then
 		git status
 		echo -e "$(BOLD)$(RED) => Repository is dirty!$(RESET)"
-#		false
+		false
 	fi
 	if [ $$(git rev-parse HEAD) != $$(git rev-parse origin/master) ]; then
 		git --no-pager log --oneline --graph origin/master...
 		echo -e "$(BOLD)$(RED) => HEAD must point to origin/master!$(RESET)"
-#		false
+		false
 	fi
